@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RotatingLines } from 'react-loader-spinner';
-import * as cotactsOperation from '../../redux/contacts/contacts-operations';
+import * as contactsOperation from '../../redux/contacts/contacts-operations';
 import {
   getIsLoading,
   getVisibleContacts,
@@ -21,7 +21,7 @@ export default function ContactList() {
   const showNumber = 6;
   const items = showAll ? contacts : contacts.slice(0, showNumber);
   useEffect(() => {
-    dispatch(cotactsOperation.fetchContacts());
+    dispatch(contactsOperation.fetchContacts());
   }, []);
 
   return (
@@ -36,7 +36,7 @@ export default function ContactList() {
             <ContactListItem key={id} name={name} number={phone}>
               <button
                 onClick={() => {
-                  dispatch(cotactsOperation.deleteContact(id));
+                  dispatch(contactsOperation.deleteContact(id));
                 }}
               >
                 Delete
