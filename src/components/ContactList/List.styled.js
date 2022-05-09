@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled';
 
 export const List = styled.ul`
-    padding-left: 6px;
-    border: 1px dashed black;
+  padding-left: 6px;
+  border: 1px dashed black;
 `;

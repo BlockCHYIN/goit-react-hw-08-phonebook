@@ -1,32 +1,65 @@
-import React, { useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { useSelector } from 'react-redux';
-import Filter from "components/Filter";
-import ContactForm from "components/ContactForm";
-import ContactList from "components/ContactList";
-import { Layout } from "components/Layout.styles";
-import { getError } from 'redux/contacts/contacts-selector';
+import React, { useEffect } from 'react';
+import { Routes, Route, Outlet } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import authOperations from 'redux/auth/auth-operations';
+import authSelectors from 'redux/auth/auth-selectors';
+
+import RegisterView from 'views/RegisterView';
+import HomeView from 'views/HomeView';
+import LoginView from 'views/LoginView';
+import PhoneBookView from 'views/PhnebookView';
+import MenuAppBar from 'components/MenuAppBar';
+import Container from '@mui/material/Container';
+import PrivateRoute from 'components/PrivatRoute';
+import PublicRoute from 'components/PublicRoute';
+
 import './App.css';
 
 function App() {
-    const error = useSelector(getError);
+  const isFetchingCurrentUser = useSelector(authSelectors.getIsFetchingCurent);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(authOperations.fetchCurrentUser());
+  }, [dispatch]);
 
-    useEffect(() => {
-        if (error !== null) {
-            toast.error(error);
-        }
-    }, [error]);
-
-    return (
-        <Layout>
-            <h2>Phonebook</h2>
-            <ContactForm />
-            <h2>Contacts</h2>
-            <Filter />
-            <ContactList />
-            <Toaster />
-        </Layout>
-    );
+  return (
+    !isFetchingCurrentUser && (
+      <Container fixed>
+        <MenuAppBar />
+        <Routes>
+          <Route path="/" element={<Outlet />}>
+            <Route index element={<HomeView />} />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <RegisterView />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <LoginView />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/phoneBook"
+              element={
+                <PrivateRoute>
+                  <PhoneBookView />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<HomeView />} />
+          </Route>
+        </Routes>
+      </Container>
+    )
+  );
 }
 
 export default App;

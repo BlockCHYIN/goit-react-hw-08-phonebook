@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { nanoid } from 'nanoid';
-import * as contactsOperation from '../../redux/contacts/contacts-operations';
+import * as cotactsOperation from '../../redux/contacts/contacts-operations';
 import toast from 'react-hot-toast';
 import { Form } from './Form.styles';
-import { InputForm } from './InputForm.styles';
 import { getItem } from 'redux/contacts/contacts-selector';
+
+import { Call, AccountCircle, Send } from '@mui/icons-material';
+import { InputAdornment, Button, TextField } from '@mui/material';
 
 export default function ContactForm() {
   const contacts = useSelector(getItem);
@@ -13,6 +15,7 @@ export default function ContactForm() {
 
   const [name, setname] = useState('');
   const [number, setnumber] = useState('');
+  const [error, setError] = useState(false);
 
   const nameInputId = nanoid();
   const numberInputId = nanoid();
@@ -22,6 +25,9 @@ export default function ContactForm() {
     switch (name) {
       case 'name':
         setname(value);
+        if (error === true) {
+          setError(false);
+        }
         break;
       case 'number':
         setnumber(value);
@@ -29,8 +35,6 @@ export default function ContactForm() {
       default:
     }
   };
-
-
 
   const handleSubmit = evt => {
     evt.preventDefault();
@@ -40,8 +44,9 @@ export default function ContactForm() {
         contact => contact.name.toLowerCase() === name.toLowerCase()
       )
     ) {
-      dispatch(contactsOperation.addContact({ name, number }));
+      dispatch(cotactsOperation.addContact({ name, number }));
     } else {
+      setError(true);
       toast.error('Rosie Simpson is already in contacts.');
     }
   };
@@ -57,33 +62,47 @@ export default function ContactForm() {
 
   return (
     <Form className="form" onSubmit={handleSubmit}>
-      <label htmlFor={nameInputId}> Name </label>
-
-      <InputForm
+      <TextField
         id={nameInputId}
         type="text"
         name="name"
         value={name}
         onChange={handleChange}
-        pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+        label="Name"
+        variant="standard"
         title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
         required
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <AccountCircle />
+            </InputAdornment>
+          ),
+        }}
+        error={error}
       />
 
-      <label htmlFor={numberInputId}> Number </label>
-
-      <InputForm
+      <TextField
         id={numberInputId}
         type="tel"
+        label="Number"
         name="number"
         value={number}
         onChange={handleChange}
-        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+        variant="standard"
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         required
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Call />
+            </InputAdornment>
+          ),
+        }}
       />
-
-      <button type="submit">add contact</button>
+      <Button variant="contained" type="submit" endIcon={<Send />}>
+        Send
+      </Button>
     </Form>
   );
 }
